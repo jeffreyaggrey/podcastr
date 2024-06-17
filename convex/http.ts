@@ -52,6 +52,7 @@ http.route({
 const validateRequest = async (
   req: Request
 ): Promise<WebhookEvent | undefined> => {
+  // key note : add the webhook secret variable to the environment variables field in convex dashboard setting
   // TODO: Update CLERT_WEBHOOK_SECRET
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET!;
   if (!webhookSecret) {

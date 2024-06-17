@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import ConvexClertProvider from "./providers/ConvexClerkProvider";
+import ConvexClerkProvider from "./providers/ConvexClerkProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ConvexClertProvider>{children}</ConvexClertProvider>
+        <ConvexClerkProvider>{children}</ConvexClerkProvider>
       </body>
     </html>
   );
