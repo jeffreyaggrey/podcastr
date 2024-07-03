@@ -8,6 +8,7 @@ import { api } from '@/convex/_generated/api';
 import { GeneratePodcastProps } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { useUploadFiles } from '@xixixao/uploadstuff/react';
+import { useToast } from '@/components/ui/use-toast';
 
 const useGeneratePodcast = ({
   setAudio,
@@ -16,6 +17,7 @@ const useGeneratePodcast = ({
   voicePrompt,
 }: GeneratePodcastProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
 
   // Using Uploadstuff generate url to store files to convex
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
@@ -32,7 +34,10 @@ const useGeneratePodcast = ({
     setAudio('');
 
     if (!voicePrompt) {
-      // TODO: Show error message
+      toast({
+        title: 'Please provide a voice type to generate a podcast',
+      });
+
       setIsGenerating(false);
       return;
     }
@@ -55,15 +60,24 @@ const useGeneratePodcast = ({
       const audioUrl = await getAudioUrl({ storageId });
       setAudio(audioUrl!);
       setIsGenerating(false);
+
+      toast({
+        title: 'Podcast generated successfully.',
+      });
     } catch (error) {
       console.error('Error generating podcast', error);
-      // TODO: Show error message
+
+      toast({
+        title: 'Error creating a podcast. Please try again.',
+        variant: 'destructive',
+      });
+
       setIsGenerating(false);
     }
   };
 
   return {
-    isGenerating: false,
+    isGenerating,
     generatePodcast,
   };
 };
@@ -86,7 +100,10 @@ const GeneratePodcast = (props: GeneratePodcastProps) => {
         />
       </div>
       <div className='mt-5 w-full max-w-[200px]'>
-        <Button className='text-16 bg-orange-1 py-4 font-bold text-white-1'>
+        <Button
+          className='text-16 bg-orange-1 py-4 font-bold text-white-1'
+          onClick={generatePodcast}
+        >
           {isGenerating ? (
             <>
               Generating
