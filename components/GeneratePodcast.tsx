@@ -35,7 +35,7 @@ const useGeneratePodcast = ({
 
     if (!voicePrompt) {
       toast({
-        title: 'Please provide a voice type to generate a podcast',
+        title: 'Please provide a voice type to generate a podcast.',
       });
 
       setIsGenerating(false);

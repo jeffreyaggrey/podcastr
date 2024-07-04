@@ -39,7 +39,7 @@ const formSchema = z.object({
 });
 
 const CreatePodcast = () => {
-  const [imagePrompt, setimagePrompt] = useState('');
+  const [imagePrompt, setImagePrompt] = useState('');
   const [imageStorageId, setImageStorageId] = useState<Id<'_storage'> | null>(
     null
   );
@@ -169,7 +169,13 @@ const CreatePodcast = () => {
               setVoicePrompt={setVoicePrompt}
               setAudioDuration={setAudioDuration}
             />
-            <GenerateThumbnail />
+            <GenerateThumbnail
+              setImage={setImageUrl}
+              setImageStorageId={setImageStorageId}
+              image={imageUrl}
+              imagePrompt={imagePrompt}
+              setImagePrompt={setImagePrompt}
+            />
 
             <div className='mt-10 w-full'>
               <Button
