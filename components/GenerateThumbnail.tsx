@@ -5,11 +5,12 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Loader } from 'lucide-react';
 import { Input } from './ui/input';
-import { cn } from '@/lib/utils';
 import { GenerateThumbnailProps } from '@/types';
 import { useToast } from './ui/use-toast';
-import { useMutation } from 'convex/react';
+import { useAction, useMutation } from 'convex/react';
 import { useUploadFiles } from '@xixixao/uploadstuff/react';
+import { v4 as uuidv4 } from 'uuid';
+import { cn } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
 
 const GenerateThumbnail = ({
@@ -30,13 +31,17 @@ const GenerateThumbnail = ({
 
   const imageRef = useRef<HTMLInputElement>(null);
 
+  const handleGenerateThumbnail = useAction(api.openai.generateThumbnailAction);
+
   const handleImage = async (blob: Blob, fileName: string) => {
     setIsImageLoading(true);
     setImage('');
 
     try {
+      // Get file
       const file = new File([blob], fileName, { type: 'image/png' });
 
+      // Upload file
       const uploaded = await startUpload([file]);
       const storageId = (uploaded[0].response as any).storageId;
 
@@ -60,8 +65,24 @@ const GenerateThumbnail = ({
     }
   };
 
-  const generateImage = async () => {};
+  const generateImage = async () => {
+    try {
+      const response = await handleGenerateThumbnail({ prompt: imagePrompt });
+      const blob = new Blob([response], { type: 'image/png' });
+
+      handleImage(blob, `thumbnail-${uuidv4()}.png`);
+    } catch (error) {
+      console.log(error);
+
+      toast({
+        title: 'Error generating thumbnail',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Prevent browser default reload on button click
     e.preventDefault();
 
     try {

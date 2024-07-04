@@ -24,7 +24,7 @@ const useGeneratePodcast = ({
   const { startUpload } = useUploadFiles(generateUploadUrl);
 
   // Openai Convex Action to get podcast audio
-  const getPodcastAudio = useAction(api.openai.generateAudioAction);
+  const handleGeneratePodcastAudio = useAction(api.openai.generateAudioAction);
 
   // Get audio url using convex mutation handler
   const getAudioUrl = useMutation(api.podcasts.getUrl);
@@ -43,7 +43,7 @@ const useGeneratePodcast = ({
     }
 
     try {
-      const response = await getPodcastAudio({
+      const response = await handleGeneratePodcastAudio({
         voice: voiceType,
         input: voicePrompt,
       });
