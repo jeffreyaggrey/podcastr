@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useQuery } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 
 import LoaderSpinner from '@/components/LoaderSpinner';
 import PodcastDetailPlayer from '@/components/PodcastDetailPlayer';
@@ -16,11 +17,15 @@ const PodcastDetails = ({
 }: {
   params: { podcastId: Id<'podcasts'> };
 }) => {
+  const { user } = useUser();
+
   const podcast = useQuery(api.podcasts.getPodcastById, { podcastId });
 
   const similarPodcasts = useQuery(api.podcasts.getPodcastByVoiceType, {
     podcastId,
   });
+
+  const isOwner = user?.id === podcast?.authorId;
 
   if (!similarPodcasts || !podcast) return <LoaderSpinner />;
 
@@ -39,7 +44,11 @@ const PodcastDetails = ({
         </figure>
       </header>
 
-      <PodcastDetailPlayer />
+      <PodcastDetailPlayer
+        isOwner={isOwner}
+        podcastId={podcast._id}
+        {...podcast}
+      />
 
       <p className='text-white-2 text-16 pb-8 pt-[3.5rem] font-medium max-md:text-center'>
         {podcast?.podcastDescription}
