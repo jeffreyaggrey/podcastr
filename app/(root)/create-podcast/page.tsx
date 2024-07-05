@@ -85,17 +85,9 @@ const CreatePodcast = () => {
           title: 'Please generate audio and image.',
         });
 
+        setIsSubmitting(false);
         throw new Error('Please generate audio and image.');
       }
-    } catch (error) {
-      console.log(error);
-
-      toast({
-        title: 'Error',
-        variant: 'destructive',
-      });
-
-      setIsSubmitting(false);
 
       // Create Podcast
       const podcast = await createPodcast({
@@ -115,11 +107,19 @@ const CreatePodcast = () => {
       toast({
         title: 'Podcast created',
       });
-
       setIsSubmitting(false);
 
       // Navigate to homepage
       router.push('/');
+    } catch (error) {
+      console.log(error);
+
+      toast({
+        title: 'Error',
+        variant: 'destructive',
+      });
+
+      setIsSubmitting(false);
     }
   }
 

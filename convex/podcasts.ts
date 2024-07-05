@@ -1,5 +1,5 @@
 import { ConvexError, v } from 'convex/values';
-import { mutation } from './_generated/server';
+import { mutation, query } from './_generated/server';
 
 export const getUrl = mutation({
   args: {
@@ -10,29 +10,28 @@ export const getUrl = mutation({
   },
 });
 
+// Create podcast mutation
 export const createPodcast = mutation({
   args: {
+    audioStorageId: v.id('_storage'),
     podcastTitle: v.string(),
     podcastDescription: v.string(),
     audioUrl: v.string(),
     imageUrl: v.string(),
-    voiceType: v.string(),
-    imagePrompt: v.string(),
+    imageStorageId: v.id('_storage'),
     voicePrompt: v.string(),
+    imagePrompt: v.string(),
+    voiceType: v.string(),
     views: v.number(),
     audioDuration: v.number(),
-    audioStorageId: v.id('_storage'),
-    imageStorageId: v.id('_storage'),
   },
   handler: async (ctx, args) => {
-    // Check for logged in user
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new ConvexError('Not authenticated');
+      throw new ConvexError('User not authenticated');
     }
 
-    // Match logged user to db
     const user = await ctx.db
       .query('users')
       .filter((q) => q.eq(q.field('email'), identity.email))
@@ -42,15 +41,30 @@ export const createPodcast = mutation({
       throw new ConvexError('User not found');
     }
 
-    // Insert record into podcasts table
-    const podcast = await ctx.db.insert('podcasts', {
-      ...args,
+    return await ctx.db.insert('podcasts', {
+      audioStorageId: args.audioStorageId,
       user: user[0]._id,
+      podcastTitle: args.podcastTitle,
+      podcastDescription: args.podcastDescription,
+      audioUrl: args.audioUrl,
+      imageUrl: args.imageUrl,
+      imageStorageId: args.imageStorageId,
       author: user[0].name,
       authorId: user[0].clerkId,
+      voicePrompt: args.voicePrompt,
+      imagePrompt: args.imagePrompt,
+      voiceType: args.voiceType,
+      views: args.views,
       authorImageUrl: user[0].imageUrl,
+      audioDuration: args.audioDuration,
     });
+  },
+});
 
-    return podcast;
+export const getTrendingPodcasts = query({
+  handler: async (ctx) => {
+    const podcasts = await ctx.db.query('podcasts').collect();
+
+    return podcasts;
   },
 });
